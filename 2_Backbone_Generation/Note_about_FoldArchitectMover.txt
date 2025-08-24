@@ -1,0 +1,14 @@
+- A version of Rosetta compliled with 5hfd was need to compute the fragment quality metrics (worst9mer and worst9mer_helix).
+
+
+
+- You will also need a database called "ss_grouped_vall_all.h5" available at:
+
+files.ipd.uw.edu/pub/modular_repeat_protein_2020/ss_grouped_vall_all.h5
+
+
+
+- A detailed explanation of the Mover is available at: 
+
+"Sampling of structure and sequence space of small protein folds" 
+https://doi.org/10.1038/s41467-022-34937-8
