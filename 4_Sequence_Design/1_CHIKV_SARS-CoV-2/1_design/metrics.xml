@@ -1,0 +1,65 @@
+<ROSETTASCRIPTS>
+	<SCOREFXNS>
+
+		<ScoreFunction name="beta_nov16_design" weights="beta_nov16" >
+      		        <Reweight scoretype="aa_composition" weight="1.0" />
+      		        <Reweight scoretype="arg_cation_pi" weight="1" />
+      		        <Reweight scoretype="netcharge" weight="1.0" />
+      		        <Reweight scoretype="approximate_buried_unsat_penalty" weight="5.0" />
+				<Set approximate_buried_unsat_penalty_hbond_energy_threshold="-0.5" />
+				<Set approximate_buried_unsat_penalty_burial_atomic_depth="4.0" />
+				<Set approximate_buried_unsat_penalty_hbond_bonus_cross_chain="-1" />
+				<Set approximate_buried_unsat_penalty_assume_const_backbone="true" />
+		</ScoreFunction>
+
+		<ScoreFunction name="beta_nov16" weights="beta_nov16"/>
+
+	</SCOREFXNS>
+	<RESIDUE_SELECTORS>
+	
+		<Chain name="chA" chains="A"/>
+		<Chain name="chB" chains="B"/>
+		
+        	<InterfaceByVector name="interface" cb_dist_cut="11.0" nearby_atom_cut="5.5" vector_angle_cut="75.0" vector_dist_cut="9.0" grp1_selector="chA" grp2_selector="chB"/>
+        	
+        	<And name="interface_A" selectors="chA,interface" />
+        	<And name="interface_B" selectors="chB,interface" />
+        	
+        	<True name="true" />
+	</RESIDUE_SELECTORS>
+	<RESIDUE_LEVEL_TASK_OPERATIONS>	 
+	</RESIDUE_LEVEL_TASK_OPERATIONS>
+	<TASKOPERATIONS>
+	</TASKOPERATIONS>
+	<FILTERS>
+
+		<ContactMolecularSurface name="contact_molecular_surface" distance_weight="0.5" target_selector="interface_A" binder_selector="interface_B" confidence="0" />
+		
+		<NetCharge name="net_charge" chain="1"/>
+		
+	</FILTERS>	
+	<MOVERS>
+		<InterfaceAnalyzerMover name="int_analyzer" scorefxn="beta_nov16" pack_separated="true" packstat="true" jump="1"/>
+	</MOVERS>
+	<SIMPLE_METRICS>
+	 	<SapScoreMetric name="sap_score" score_selector="chA" />	
+	        <SapScoreMetric name="binder_blocked_sap" score_selector="chA" sap_calculate_selector="chA" sasa_selector="true" />
+	        
+	        <CalculatorMetric name="binder_delta_sap" equation="binder_sap_score - binder_blocked_sap" >
+            		<VAR name="binder_sap_score" metric="sap_score"/>
+            		<VAR name="binder_blocked_sap" metric="binder_blocked_sap"/>
+        	</CalculatorMetric>		
+        	
+	</SIMPLE_METRICS>
+	<APPLY_TO_POSE>
+	</APPLY_TO_POSE>
+	<PROTOCOLS>
+		<Add mover="int_analyzer"/>
+		<Add filter="contact_molecular_surface"/>
+		<Add metrics="binder_delta_sap" />
+		<Add metrics="sap_score" />
+		<Add filter="net_charge"/>
+		
+	</PROTOCOLS>
+	<OUTPUT scorefxn="beta_nov16" />
+</ROSETTASCRIPTS>

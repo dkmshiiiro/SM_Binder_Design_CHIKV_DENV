@@ -1,0 +1,26 @@
+Rosetta doesn't easily allow protonated histidine, because of that I used this method to allow it:
+
+1-copy HIS_P.params (protonated HIS parameters) from data base to current directory:
+
+cp rosetta_3.13/main/database/chemical/residue_type_sets/fa_standard/residue_types/protonation_states/HIS_P.params .
+
+2-modify HIS_P.params according:
+
+NAME HIS_P --> NAME HIP
+
+comment VARIANT PROTONATED
+
+IO_STRING HIS H --> IO_STRING HIP H
+
+comment AA HIS
+
+PROPERTIES PROTEIN CANONICAL_AA ALPHA_AA L_AA POLAR METALBINDING CHARGED POSITIVE_CHARGE --> PROPERTIES PROTEIN CANONICAL_AA ALPHA_AA L_AA POLAR SC_ORBITALS METALBINDING CYCLIC CHARGED POSITIVE_CHARGE
+
+3- Rename HIS residues in your pdb to HIP, I like to use pdb-tools (http://www.bonvinlab.org/pdb-tools/):
+
+pdb_rplresname -HIS:HIP <file.pdb> > <file_temp.pdb>
+mv file_temp.pdb file.pdb
+
+4- use flag -extra_res_fa HIS_P.params on your protocols 
+
+5- profit (remember to rename back to HIS if other softwares are used)

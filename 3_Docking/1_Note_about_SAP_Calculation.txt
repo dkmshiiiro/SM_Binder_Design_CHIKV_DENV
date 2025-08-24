@@ -1,0 +1,4 @@
+- To calculate the SAP score for the target a rosetta .xml was used, together with a python script in pymol to display it. Both scripts named "per_res_sap.xml" and "per_res_sap.py" are available at:
+
+"Design of protein-binding proteins from the target structure alone"
+https://doi.org/10.1038/s41586-022-04654-9

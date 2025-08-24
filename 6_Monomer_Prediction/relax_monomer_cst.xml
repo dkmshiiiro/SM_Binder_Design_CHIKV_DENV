@@ -1,0 +1,37 @@
+<ROSETTASCRIPTS>
+	<SCOREFXNS>
+
+		<ScoreFunction name="beta_nov16_cst" weights="beta_nov16_cst" >
+		</ScoreFunction>
+		<ScoreFunction name="beta_nov16" weights="beta_nov16" >
+		</ScoreFunction>
+	</SCOREFXNS>
+	<RESIDUE_SELECTORS>
+	</RESIDUE_SELECTORS>
+	<RESIDUE_LEVEL_TASK_OPERATIONS>
+	</RESIDUE_LEVEL_TASK_OPERATIONS>
+	<TASKOPERATIONS>
+		<ExtraRotamersGeneric name="ex1_ex2aro" ex1="1" ex2aro="1"/>
+	</TASKOPERATIONS>
+	<FILTERS>
+	</FILTERS>
+	<MOVERS>
+	
+		<FastRelax name="relax" repeats="1" scorefxn="beta_nov16_cst" relaxscript="MonomerRelax2019" task_operations="ex1_ex2aro" cartesian="0" bondangle="0" bondlength="0" ramp_down_constraints="false">
+			<MoveMap name="relax" bb="true" chi="true" jump="true"/>
+		</FastRelax>
+
+		<AddConstraintsToCurrentConformationMover name="cst_current" CA_only="1"/>
+
+	</MOVERS>
+	<SIMPLE_METRICS>			
+	</SIMPLE_METRICS>
+	<APPLY_TO_POSE>
+	</APPLY_TO_POSE>
+	<PROTOCOLS>
+		<Add mover="cst_current"/>
+		<Add mover="relax"/>
+
+	</PROTOCOLS>
+	<OUTPUT scorefxn="beta_nov16" />
+</ROSETTASCRIPTS>

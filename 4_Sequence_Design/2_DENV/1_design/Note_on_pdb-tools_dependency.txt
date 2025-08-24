@@ -1,0 +1,5 @@
+- In this case of DENV, you need to change the name of histidines from HIS to HIP and reverse every cycle. 
+- Rosetta will understand HIP as a protonated histidine in the structural optmization.
+- ProteinMPNN need to have HIS as histidine 3-letter code, that's why we need to go back every cycle.
+
+- The "design_acid.sh" script is dependent on the "pdb_rplresname.py" script to make these residue name changes. The Python script is available as part of pdb-tools and it need to be in the current directory.

@@ -1,0 +1,4 @@
+- At the end of the design script you will have a directory full of pdb files which are you designed models.
+
+- Use the metrics.xml with RosettaScripts to extract the  metrics that are used in the Pre-filtering step. 
+- The output should be a silent file containing the calculated metrics.  

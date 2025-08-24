@@ -1,0 +1,7 @@
+- This is "Pre-filtering" step of the protocol.
+
+- The "filter_designs.sh" script will take the silent file containing all the designs and extract only the ones that meet the criteria specified in "req.file". The script also rename the extracted files according to their interaction energy ranks.  
+
+- The script "filter_designs.sh" is dependent on the perl script "DesignSelect.pl" in the current directory. It is available in Rosetta:
+
+rosetta_3.13/main/source/src/apps/public/enzdes/DesignSelect.pl

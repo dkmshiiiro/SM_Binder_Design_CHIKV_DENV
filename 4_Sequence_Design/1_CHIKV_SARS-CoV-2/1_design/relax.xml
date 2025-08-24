@@ -1,0 +1,73 @@
+<ROSETTASCRIPTS>
+	<SCOREFXNS>
+		<ScoreFunction name="beta_nov16_rlx" weights="beta_nov16">
+			<Reweight scoretype="arg_cation_pi" weight="1" />
+			<Reweight scoretype="approximate_buried_unsat_penalty" weight="5.0" />
+				<Set approximate_buried_unsat_penalty_hbond_energy_threshold="-0.5" />
+				<Set approximate_buried_unsat_penalty_burial_atomic_depth="4.0" />
+				<Set approximate_buried_unsat_penalty_assume_const_backbone="true" />
+		</ScoreFunction>
+		
+		<ScoreFunction name="beta_nov16" weights="beta_nov16"/>
+		
+	</SCOREFXNS>
+	<RESIDUE_SELECTORS>
+	
+		<Chain name="chA" chains="A"/>
+		<Chain name="chB" chains="B"/>
+		
+		<InterfaceByVector name="interface" cb_dist_cut="11.0" nearby_atom_cut="5.5" vector_angle_cut="75.0" vector_dist_cut="9.0" grp1_selector="chA" grp2_selector="chB"/>
+        	
+	</RESIDUE_SELECTORS>
+	<RESIDUE_LEVEL_TASK_OPERATIONS>
+	
+       	 <PreventRepackingRLT name="PreventRepacking" />
+       	 <RestrictToRepackingRLT name="RestrictToRepacking" />
+       	 
+	</RESIDUE_LEVEL_TASK_OPERATIONS>
+	<TASKOPERATIONS>
+
+		<ExtraRotamersGeneric name="ex1_ex2aro" ex1="1" ex2aro="1"/>
+
+		all
+		RHKDESTNQGAVILMFYW
+		
+		<DesignRestrictions name="interface_and_binder">
+			<Action residue_selector="interface AND chB" residue_level_operations="RestrictToRepacking"/>
+			<Action residue_selector="interface AND chA" residue_level_operations="RestrictToRepacking"/>
+			<Action residue_selector="! interface AND chA" residue_level_operations="RestrictToRepacking"/>
+			<Action residue_selector="! interface AND chB" residue_level_operations="PreventRepacking"/>
+		</DesignRestrictions>
+		
+		<IncludeCurrent name="current_sc" />
+		
+		<PruneBuriedUnsats name="prune_buried_unsats" allow_even_trades="false" atomic_depth_cutoff="4.0" minimum_hbond_energy="-0.5" />
+    		
+    		<LimitAromaChi2 name="limitchi2_aro" chi2max="110" chi2min="70" include_trp="true" />
+	</TASKOPERATIONS>
+	<FILTERS>
+	</FILTERS>	
+	<MOVERS>
+		<SimpleThreadingMover name="put_seq" start_position="1" thread_sequence="%%seq%%" pack_neighbors="false" pack_rounds="1"/>
+		
+		<FastRelax name="relax" disable_design="true" repeats="1" scorefxn="beta_nov16_rlx" relaxscript="InterfaceRelax2019" task_operations="ex1_ex2aro,interface_and_binder,current_sc,prune_buried_unsats,limitchi2_aro" cartesian="0" bondangle="0" bondlength="0" ramp_down_constraints="false">
+			<MoveMap name="relax">
+			<Jump number="1" setting="true" />
+			<Chain number="1" chi="true" bb="true" />
+			<Chain number="2" chi="true" bb="true" />
+			</MoveMap>
+		</FastRelax>
+
+	</MOVERS>
+	<SIMPLE_METRICS>			
+	</SIMPLE_METRICS>
+	<APPLY_TO_POSE>
+	</APPLY_TO_POSE>
+	<PROTOCOLS>
+	
+		<Add mover="put_seq"/>
+		<Add mover="relax"/>
+		
+	</PROTOCOLS>
+	<OUTPUT scorefxn="beta_nov16" />
+</ROSETTASCRIPTS>

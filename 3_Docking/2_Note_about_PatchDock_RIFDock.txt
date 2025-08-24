@@ -1,0 +1,17 @@
+PATCHDOCK
+
+- It is probably better to use a local version of PatchDock since for each backbone a PatchDock run must be conducted. 
+- A script name "patchdock_run.sh" for automating this process is available. You need the local version of PatchDock installed and the PatchDock executables accessible in your system path.
+- "PATCHDOCK_RES" is where you defined your target residues (which as explained in the main text, should be located in a high SAP area)
+
+
+RIFDOCK
+
+- To use rifdock you need to install a 3.9 version of Rosetta
+- RifDock is available at: https://github.com/rifdock/rifdock
+- A comprehensive guide for its usage in binder design is available at: 
+
+"Design of protein-binding proteins from the target structure alone"
+https://doi.org/10.1038/s41586-022-04654-9 
+
+- Expect to use lots of RAM, 16 GB is often not enough. 

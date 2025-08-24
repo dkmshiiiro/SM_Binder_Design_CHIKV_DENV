@@ -1,0 +1,8 @@
+req contact_molecular_surface value > 450
+req binder_delta_sap value > 12
+req sap_score value < 35
+req dG_separated value < -30
+req delta_unsatHbonds value < 10
+req net_charge value < -4
+req net_charge value > -16	
+output sortmin dG_separated

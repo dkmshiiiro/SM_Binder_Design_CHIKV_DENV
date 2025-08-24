@@ -1,0 +1,138 @@
+<ROSETTASCRIPTS>
+	<SCOREFXNS>
+		<ScoreFunction name="CENTROID" weights="fldsgn_cen" symmetric="0" >
+			Reweight scoretype="hbond_lr_bb" weight="1.0" 
+			<Reweight scoretype="hbond_sr_bb" weight="1.0" />
+			<Reweight scoretype="atom_pair_constraint" weight="1.0" />
+			<Reweight scoretype="coordinate_constraint" weight="1.0" />
+			<Reweight scoretype="angle_constraint" weight="1.0" />
+			<Reweight scoretype="dihedral_constraint" weight="1.0" />
+			<Reweight scoretype="backbone_stub_constraint" weight="1.0" />
+			<Reweight scoretype="omega" weight="0.5" />
+			<Reweight scoretype="rama" weight="0.6" />
+			<Reweight scoretype="rg" weight="2.5" /> 2.0
+			<Reweight scoretype="cenpack" weight="1.0"/> 
+			</ScoreFunction>
+
+			<ScoreFunction name="r15" weights="ref2015"/>
+		</SCOREFXNS>
+		
+		<RESIDUE_SELECTORS>
+			<SecondaryStructure name="loops" ss="L" use_dssp="0" />
+		<Not name="not_loops" selector="loops" />
+		<NamedSegment name="H1_nterm" segment="H1" residues="1,2,3" error_on_missing_segment="0" /> (3,4,5 for 13:15)
+		<NamedSegment name="H1_cterm" segment="H1" residues="-1,-2,-3" error_on_missing_segment="0" />
+		<NamedSegment name="H1_mid" segment="H1" residues="-6,-7,-8" error_on_missing_segment="0" />
+		
+		<NamedSegment name="H2_nterm" segment="H2" residues="1,2,3" error_on_missing_segment="0" />
+		<NamedSegment name="H2_cterm" segment="H2" residues="-1,-2,-3" error_on_missing_segment="0" />
+		<NamedSegment name="H2_mid" segment="H2" residues="-6,-7,-8" error_on_missing_segment="0" />
+		
+		<NamedSegment name="H3_nterm" segment="H3" residues="1,2,3" error_on_missing_segment="0" />
+		<NamedSegment name="H3_cterm" segment="H3" residues="-1,-2,-3" error_on_missing_segment="0" />
+		<NamedSegment name="H3_mid" segment="H3" residues="-6,-7,-8" error_on_missing_segment="0" />
+		
+		<NamedSegment name="H4_nterm" segment="H4" residues="1,2,3" error_on_missing_segment="0" />
+		<NamedSegment name="H4_cterm" segment="H4" residues="-1,-2,-3" error_on_missing_segment="0" />
+		<NamedSegment name="H4_mid" segment="H4" residues="-6,-7,-8" error_on_missing_segment="0" /> -6,-7,-8
+		
+
+	</RESIDUE_SELECTORS>
+	
+	<TASKOPERATIONS>
+		<ExtraRotamersGeneric name="ex1_ex2" ex1="1" ex2="1"/>
+		<RestrictToRepacking name="repackonly" />
+	</TASKOPERATIONS>
+
+	<FILTERS>
+		<Geometry name="geometry" />
+		<SecondaryStructure name="secstruct_filter" residue_selector="not_loops" compute_pose_secstruct_by_dssp="1" /> 
+		<HelixKink name="kink" />		
+		<worst9mer name="worst9mer" confidence="0" rmsd_lookup_threshold="0.4" />
+		<worst9mer name="worst9mer_helix" confidence="0" rmsd_lookup_threshold="0.15" only_helices="true"/>
+		<HelixPairing name="helix_pairs" use_dssp="0" dist="13.0" cross="30.0"/>
+		HelixPairing name="helix_pairs" use_dssp="0"/>
+	</FILTERS>
+	
+	<MOVERS>
+		<AddConstraints name="build_csts" >
+                        <DistanceConstraintGenerator name="H1_to_H4" function="HARMONIC 0.0 3.0" residue_selector1="H1_nterm" residue_selector2="H4_mid" /> 3.0
+			<DistanceConstraintGenerator name="H1_to_H3" function="HARMONIC 0.0 3.0" residue_selector1="H1_cterm" residue_selector2="H3_cterm" /> 3.0                     
+			<DistanceConstraintGenerator name="H4_to_H2" function="HARMONIC 0.0 3.0" residue_selector1="H4_cterm" residue_selector2="H2_cterm" /> 3.0	
+		</AddConstraints>
+		RemoveConstraints name="rm_coord_csts" constraint_generators="H1_to_H4" />
+
+    		<SetSecStructEnergies name="set_ssene1" scorefxn="CENTROID" />
+
+		<PackRotamersMover name="pack" nloop="1" scorefxn="r15" task_operations="repackonly,ex1_ex2"/>
+		<MinMover name="min_sc" scorefxn="r15" chi="true" bb="0" omega="false" />
+
+		<BuildDeNovoBackboneMover name="build_bb" dump_pdbs="0" >
+			<CompoundArchitect name="">
+				<Architects>
+					<HelixArchitect name="H1" length="13:14" /> ok 13:14
+					<HelixArchitect name="H2" length="13:14" />
+					<HelixArchitect name="H3" length="13:14" /> 
+					<HelixArchitect name="H4" length="13:14" />
+
+				</Architects>
+				<Connections>
+					<Connection name="H1_H2" motif="4LX,3LX" segment1="H1" segment2="H2" ideal_abego="0" /> 4LX,3LX ideial abego or not? (not=80% success/faster generation)(yes=33% gen)
+					<Connection name="H2_H3" motif="1LX" segment1="H2" segment2="H3" ideal_abego="0" /> 1LX
+					<Connection name="H3_H4" motif="4LX,3LX" segment1="H3" segment2="H4" ideal_abego="0" /> 4LX,3LX
+
+				</Connections>
+				<Pairing>
+					<HelixPairing segments="H3,H4" parallel="0" />
+					HelixPairing segments="H2,H4" parallel="1" />
+					HelixPairing segments="H2,H4" parallel="0" />
+				</Pairing>
+			</CompoundArchitect>
+			
+			<RemodelLoopMoverPoseFolder scorefxn="CENTROID" />
+
+			<CompoundPerturber>
+				<HelixPerturber architect="H1"/> 
+				<HelixPerturber architect="H2"/> 
+				<HelixPerturber architect="H3"/>
+				<HelixPerturber architect="H4"/> 
+ 
+				<ConnectionPerturber architect="H1_H2" />
+				ConnectionPerturber architect="H2_H3" />
+				<ConnectionPerturber architect="H3_H4" />
+				
+			</CompoundPerturber>
+
+			<PreFoldMovers>
+				<Add mover="set_ssene1" />
+				<Add mover="build_csts" />
+			</PreFoldMovers>
+			
+			<PostFoldMovers>
+			</PostFoldMovers>
+
+			<Filters>
+			
+				<Add filter="geometry" />
+				<Add filter="secstruct_filter"/>
+				<Add filter="kink"/>
+				<Add filter="helix_pairs" />
+				
+			</Filters>	
+		</BuildDeNovoBackboneMover>
+					
+	</MOVERS>
+	<FILTERS>
+	</FILTERS>
+	<PROTOCOLS>
+	
+		<Add mover="build_bb" />
+		<Add mover="pack"/>
+		<Add mover="min_sc"/>
+		<Add filter="worst9mer" />
+		<Add filter="worst9mer_helix" /> 
+
+	</PROTOCOLS>
+
+
+</ROSETTASCRIPTS>
