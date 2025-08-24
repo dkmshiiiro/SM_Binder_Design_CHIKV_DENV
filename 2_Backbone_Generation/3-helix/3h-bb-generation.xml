@@ -1,0 +1,104 @@
+<ROSETTASCRIPTS>
+	<SCOREFXNS>
+		<ScoreFunction name="CENTROID" weights="fldsgn_cen" symmetric="0" >
+			Reweight scoretype="hbond_lr_bb" weight="1.0" 
+			<Reweight scoretype="hbond_sr_bb" weight="1.0" />
+			<Reweight scoretype="atom_pair_constraint" weight="1.0" />
+			<Reweight scoretype="coordinate_constraint" weight="1.0" />
+			<Reweight scoretype="angle_constraint" weight="1.0" />
+			<Reweight scoretype="dihedral_constraint" weight="1.0" />
+			<Reweight scoretype="backbone_stub_constraint" weight="1.0" />
+			<Reweight scoretype="omega" weight="0.5" />
+			<Reweight scoretype="rama" weight="0.6" />
+			<Reweight scoretype="rg" weight="2.0" /> 2.0
+			<Reweight scoretype="cenpack" weight="1.0"/> 
+		</ScoreFunction>
+	</SCOREFXNS>
+	
+	<RESIDUE_SELECTORS>
+		<SecondaryStructure name="loops" ss="L" use_dssp="0" />
+		<Not name="not_loops" selector="loops" />
+	</RESIDUE_SELECTORS>
+	
+	<FILTERS>
+		<Geometry name="geometry" />
+		<SecondaryStructure name="secstruct_filter" residue_selector="not_loops" compute_pose_secstruct_by_dssp="1" /> 
+		<HelixKink name="kink" />
+			
+		HelixPairing name="helix_pairs" use_dssp="0" dist="12.5" cross="20.0"
+		
+		<HelixPairing name="helix_pairs" use_dssp="0" dist="12.5" cross="20.0"/>
+		
+		<worst9mer name="worst9mer" confidence="0" rmsd_lookup_threshold="0.4" />
+        	<worst9mer name="worst9mer_helix" confidence="0" rmsd_lookup_threshold="0.15" only_helices="true"/>
+        	
+	</FILTERS>
+	
+	<MOVERS>
+	
+		<MinMover name="cenmin" scorefxn="CENTROID" bb="1" chi="0" jump="0" cartesian="0" />
+
+    		<SetSecStructEnergies name="set_ssene1" scorefxn="CENTROID" />
+    		
+		<BuildDeNovoBackboneMover name="build_bb" dump_pdbs="0" >
+			<CompoundArchitect name="">
+				<Architects>
+					<HelixArchitect name="H1" length="15:17" /> maybe this lenght matters (15:17 ok)
+					<HelixArchitect name="H2" length="15:17" />
+					<HelixArchitect name="H3" length="15:17" />
+				</Architects>
+				<Connections>
+					<Connection name="H1_H2" motif="3LX,4LX" segment1="H1" segment2="H2" ideal_abego="0" /> ideial abego or not? (not=80% success/faster generation)(yes=33% gen)
+					<Connection name="H2_H3" motif="3LX,4LX" segment1="H2" segment2="H3" ideal_abego="0" />
+				</Connections>
+				<Pairing>
+					<HelixPairing segments="H1,H2" parallel="0" />
+					<HelixPairing segments="H1,H3" parallel="1" />
+					<HelixPairing segments="H2,H3" parallel="0" />
+
+				</Pairing>
+			</CompoundArchitect>
+			
+			<RemodelLoopMoverPoseFolder scorefxn="CENTROID" />
+
+			<CompoundPerturber>
+				<HelixPerturber architect="H1"/> 
+				<HelixPerturber architect="H2"/> 
+				<HelixPerturber architect="H3"/>
+ 
+				<ConnectionPerturber architect="H1_H2" />
+				<ConnectionPerturber architect="H2_H3" />
+
+			</CompoundPerturber>
+
+			<PreFoldMovers>
+				<Add mover="set_ssene1" />
+			</PreFoldMovers>
+			
+			<PostFoldMovers>
+				Add mover="cenmin" 
+			</PostFoldMovers>
+
+			<Filters>
+			
+				<Add filter="geometry" />
+				<Add filter="secstruct_filter"/>
+				<Add filter="kink"/>
+				<Add filter="helix_pairs"/> 
+				
+			</Filters>	
+		</BuildDeNovoBackboneMover>
+					
+	</MOVERS>
+	<FILTERS>
+	</FILTERS>
+	<PROTOCOLS>
+	
+		<Add mover="build_bb" />
+		<Add filter="worst9mer" />
+		<Add filter="worst9mer_helix" /> 
+		#better put something to repack and minimize side chain here in next projects
+	</PROTOCOLS>
+
+
+</ROSETTASCRIPTS>
